@@ -24,5 +24,4 @@ let NamedArray = fun _contract label value =>
         metadata | ObjectMeta,
         spec | ServiceSpec,
     },
-    mkService = fun name svc => { metadata.name = name } & svc | Service
 }
