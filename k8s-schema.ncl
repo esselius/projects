@@ -1,4 +1,5 @@
 let to_name_array = fun a => array.map (fun k => { name = k } & a."%{k}") (record.fields a) in
+let NamedArray = fun label value => if builtin.is_array value then value else to_name_array value in
 {
     ObjectMeta = {
         name | Str,
@@ -8,7 +9,8 @@ let to_name_array = fun a => array.map (fun k => { name = k } & a."%{k}") (recor
         port | Num,
     },
     ServiceSpec = {
-        ports | Array ServicePort,
+        ports | NamedArray
+              | Array ServicePort,
         clusterIP | Str | optional,
         selector | {_:Str},
     }, 
@@ -18,10 +20,5 @@ let to_name_array = fun a => array.map (fun k => { name = k } & a."%{k}") (recor
         metadata | ObjectMeta,
         spec | ServiceSpec,
     },
-    mkService = fun name svc => { metadata.name = name } &
-        record.update "spec" (
-            record.update "ports" (
-                to_name_array svc.spec.ports
-            ) svc.spec
-        ) svc | Service
+    mkService = fun name svc => { metadata.name = name } & svc | Service
 }
