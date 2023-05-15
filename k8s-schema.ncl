@@ -1,20 +1,16 @@
-let to_name_array = fun a => array.map (fun k => { name = k } & a."%{k}") (record.fields a) in
-let NamedArray = fun _contract label value =>
-    contract.apply
-        (Array _contract)
-        label
-        (if builtin.is_array value then value else to_name_array value) in
+let { NameArray, SplitArrayStr, StrLength, .. } = import "utils.ncl" in
 
 {
     ObjectMeta = {
-        name | Str,
+        name | Str | optional,
+        labels | {_:Str} | optional,
     },
     ServicePort = {
         name | Str,
         port | Num,
     },
     ServiceSpec = {
-        ports | NamedArray ServicePort,
+        ports | NameArray ServicePort,
         clusterIP | Str | optional,
         selector | {_:Str},
     }, 
@@ -23,5 +19,56 @@ let NamedArray = fun _contract label value =>
         kind = "Service",
         metadata | ObjectMeta,
         spec | ServiceSpec,
+    },
+    LabelSelector = {
+        matchLabels | {_:Str},
+    },
+    EnvVar = {
+        name | Str,
+        value | Str,
+    },
+    VolumeMount = {
+        name | Str,
+        mountPath | Str,
+    },
+    ContainerPort = {
+        name | Str | StrLength 1 15,
+        containerPort | Num,
+    },
+    Container = {
+        name | Str,
+        image | Str,
+        args | SplitArrayStr,
+        env | NameArray EnvVar | optional,
+        volumeMounts | NameArray VolumeMount,
+        ports | NameArray ContainerPort | optional,
+    },
+    EmptyDirVolumeSource = {
+        medium | Str | optional,
+    },
+    Volume = {
+        name | Str,
+        emptyDir | EmptyDirVolumeSource,
+    },
+    PodSpec = {
+        initContainers | NameArray Container | optional,
+        containers | NameArray Container,
+        volumes | NameArray Volume,
+    },
+    PodTemplateSpec = {
+        metadata | ObjectMeta,
+        spec | PodSpec,
+    },
+    StatefulSetSpec = {
+        replicas | Num | optional,
+        selector | LabelSelector,
+        serviceName | Str,
+        template | PodTemplateSpec,
+    },
+    StatefulSet = {
+        apiVersion = "apps/v1",
+        kind = "StatefulSet",
+        metadata | ObjectMeta,
+        spec | StatefulSetSpec,
     },
 }

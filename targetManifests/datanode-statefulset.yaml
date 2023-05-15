@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: datanode
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: datanode
+  serviceName: datanode
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: datanode
+    spec:
+      containers:
+      - name: datanode
+        image: apache/ozone
+        args:
+        - ozone
+        - datanode
+        env:
+        - name: OZONE-SITE.XML_ozone.metadata.dirs
+          value: /data/metadata
+        - name: OZONE-SITE.XML_ozone.scm.names
+          value: scm-0.scm
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}

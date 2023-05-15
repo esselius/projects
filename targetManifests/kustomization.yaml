@@ -1,0 +1,12 @@
+images:
+- name: apache/ozone
+  newTag: 1.3.0
+
+resources:
+- datanode-statefulset.yaml
+
+- om-statefulset.yaml
+- om-service.yaml
+
+- scm-statefulset.yaml
+- scm-service.yaml

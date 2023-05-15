@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: om
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: om
+  serviceName: om
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: om
+    spec:
+      containers:
+      - name: om
+        image: apache/ozone
+        args:
+        - ozone
+        - om
+        env:
+        - name: WAITFOR
+          value: scm-0.scm:9876
+        - name: ENSURE_OM_INITIALIZED
+          value: /data/metadata/om/current/VERSION
+        - name: OZONE-SITE.XML_ozone.metadata.dirs
+          value: /data/metadata
+        - name: OZONE-SITE.XML_ozone.scm.block.client.address
+          value: scm-0.scm
+        - name: OZONE-SITE.XML_ozone.scm.client.address
+          value: scm-0.scm
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}
