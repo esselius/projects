@@ -1,3 +1,4 @@
+let { array, record, string, contract, .. } = std in
 let { StatefulSet, Service, ServicePort, EnvVar, Container, .. } = import "k8s-schema.ncl" in
 
 {
@@ -6,14 +7,14 @@ let { StatefulSet, Service, ServicePort, EnvVar, Container, .. } = import "k8s-s
         |> array.map (fun k => { name = k } & a."%{k}"),
 
     NameArray = fun _contract label value =>
-        if builtin.is_array value
+        if std.is_array value
         then value
         else to_name_array value | Array _contract,
 
-    SplitArrayStr = fun label value =>
-        if builtin.is_array value
+    SplitArrayString = fun label value =>
+        if std.is_array value
         then value
-        else string.split " " value | Array Str,
+        else string.split " " value | Array String,
 
     mkStatefulService = fun a labels => 
         [
@@ -71,9 +72,9 @@ let { StatefulSet, Service, ServicePort, EnvVar, Container, .. } = import "k8s-s
     yaml_multi_doc = fun a =>
         string.join
             ""
-            (array.map (builtin.serialize `Yaml) a),
+            (array.map (std.serialize 'Yaml) a),
 
-    StrLength = fun min max label value =>
+    StringLength = fun min max label value =>
         if string.length value >= min &&
             string.length value <= max
         then value

@@ -1,18 +1,18 @@
-let { NameArray, SplitArrayStr, StrLength, .. } = import "utils.ncl" in
+let { NameArray, SplitArrayString, StringLength, .. } = import "utils.ncl" in
 
 {
     ObjectMeta = {
-        name | Str | optional,
-        labels | {_:Str} | optional,
+        name | String| optional,
+        labels | {_:String} | optional,
     },
     ServicePort = {
-        name | Str,
-        port | Num,
+        name | String,
+        port | Number,
     },
     ServiceSpec = {
         ports | NameArray ServicePort,
-        clusterIP | Str | optional,
-        selector | {_:Str},
+        clusterIP | String| optional,
+        selector | {_:String},
     }, 
     Service = {
         apiVersion = "v1",
@@ -21,33 +21,33 @@ let { NameArray, SplitArrayStr, StrLength, .. } = import "utils.ncl" in
         spec | ServiceSpec,
     },
     LabelSelector = {
-        matchLabels | {_:Str},
+        matchLabels | {_:String},
     },
     EnvVar = {
-        name | Str,
-        value | Str,
+        name | String,
+        value | String,
     },
     VolumeMount = {
-        name | Str,
-        mountPath | Str,
+        name | String,
+        mountPath | String,
     },
     ContainerPort = {
-        name | Str | StrLength 1 15,
-        containerPort | Num,
+        name | String| StringLength 1 15,
+        containerPort | Number,
     },
     Container = {
-        name | Str,
-        image | Str,
-        args | SplitArrayStr,
+        name | String,
+        image | String,
+        args | SplitArrayString,
         env | NameArray EnvVar | optional,
         volumeMounts | NameArray VolumeMount,
         ports | NameArray ContainerPort | optional,
     },
     EmptyDirVolumeSource = {
-        medium | Str | optional,
+        medium | String| optional,
     },
     Volume = {
-        name | Str,
+        name | String,
         emptyDir | EmptyDirVolumeSource,
     },
     PodSpec = {
@@ -60,9 +60,9 @@ let { NameArray, SplitArrayStr, StrLength, .. } = import "utils.ncl" in
         spec | PodSpec,
     },
     StatefulSetSpec = {
-        replicas | Num | optional,
+        replicas | Number | optional,
         selector | LabelSelector,
-        serviceName | Str,
+        serviceName | String,
         template | PodTemplateSpec,
     },
     StatefulSet = {
